@@ -26,14 +26,38 @@ node_types:
     properties:
       description:
         type: string
+      kube_config:
+        type: string
+        required: false
+        description: |
+          The kube config that will be used if provided
+      namespace:
+        description: namespace where to install the chart
+        type: string
+        required: true
+      create_namespace:
+        description: create namespace by helm or not
+        type: boolean
+        default: false
+      release_name:
+        description: helm release name
+        type: string
+        required: true
       outputs:
         type: map
         required: false
         description: Mapping between output names and k8s lookups.
         entry_schema:
           type: string
-#    interfaces:
-#      Standard:
+    artifacts:
+      - chart:
+          file: chart/chart.tgz
+          type: tosca.artifacts.File
+      - values:
+          file: chart/values.yaml
+          type: tosca.artifacts.File
+    interfaces:
+      Standard:
 #        create:
 #          implementation: scripts/create.sh
 #        configure:
@@ -46,17 +70,16 @@ node_types:
 #            NAMESPACE: { get_property: [SELF, namespace] }
 #            debug_operations: { get_property: [SELF, debug_operations] }
 #          implementation: playbook/configure.yml
-#        start:
-#          inputs:
-#            KUBECONFIG_FILE: { get_attribute: [SELF, kube_config_file_path] }
-#            PARAMETER_FILE: { get_attribute: [SELF, parameter_file] }
-#            CONFIG_FILE: { get_attribute: [SELF, config_file_path] }
-#            debug_operations: { get_property: [SELF, debug_operations] }
-#          implementation: scripts/delete.sh
-#        stop:
-#          inputs:
-#            KUBECONFIG_FILE: { get_attribute: [SELF, kube_config_file_path] }
-#            PARAMETER_FILE: { get_attribute: [SELF, parameter_file] }
-#            CONFIG_FILE: { get_attribute: [SELF, config_file_path] }
-#            debug_operations: { get_property: [SELF, debug_operations] }
-#          implementation: scripts/delete.sh
+        start:
+          inputs:
+            kube_config: { get_property: [SELF, kube_config] }
+            namespace: { get_property: [ SELF, namespace ] }
+            create_namespace: { get_property: [ SELF, create_namespace ] }
+            release: { get_property: [ SELF, release_name] }
+          implementation: playbooks/start.yml
+        stop:
+          inputs:
+            kube_config: { get_property: [SELF, kube_config] }
+            namespace: { get_property: [ SELF, namespace ] }
+            release: { get_property: [ SELF, release_name] }
+          implementation: playbooks/stop.yml

@@ -1,0 +1,33 @@
+- name: Install helm chart
+  hosts: all
+  become: false
+  tasks:
+    - name: Create temporary file to store kube config file
+      tempfile:
+        state: file
+        suffix: kube_config_file
+      register: kube_config_file
+
+    - name: Save kube config in temp file
+      copy:
+        content: "{{ kube_config }}"
+        dest: "{{ kube_config_file.path }}"
+
+    - name: debug vars
+      debug: 
+       msg: namespace {{ namespace }}, release {{ release }} createns {{ create_namespace }}
+
+    - name: run helm install
+      shell:
+        cmd: helm install --kubeconfig {{ kube_config_file.path }} -n {{ namespace }} {{ release }} {{ chart }} -f {{ values }} --create-namespace
+      when: (create_namespace is defined) and (create_namespace == "true")
+
+    - name: run helm install
+      shell:
+        cmd: helm install --kubeconfig {{ kube_config_file.path }} -n {{ namespace }} {{ release }} {{ chart }} -f {{ values }}
+      when: (create_namespace is not defined) or (create_namespace == "false")
+
+    - name: remove temporary file
+      file:
+        path: "{{ kube_config_file.path }}"
+        state: absent
