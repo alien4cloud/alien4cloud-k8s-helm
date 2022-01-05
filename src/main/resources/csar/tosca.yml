@@ -1,0 +1,62 @@
+tosca_definitions_version: alien_dsl_3_0_0
+
+metadata:
+  template_name: org.alien4cloud.k8s.helm
+  template_version: 3.0.0
+  template_author: a4c
+
+imports:
+  - tosca-normative-types:1.0.0-ALIEN20
+  - alien-base-types:3.0.0
+  - docker-types:3.0.0
+  - yorc-types:1.1.0
+
+description: >
+  Helm / TOSCA integration
+
+node_types:
+
+  org.alien4cloud.k8s.helm.HelmChart:
+    derived_from: tosca.nodes.Root
+    abstract: true
+    metadata:
+      icon: /images/helm-icon-color.png
+    description: |
+      Base type for Helm charts
+    properties:
+      description:
+        type: string
+      outputs:
+        type: map
+        required: false
+        description: Mapping between output names and k8s lookups.
+        entry_schema:
+          type: string
+#    interfaces:
+#      Standard:
+#        create:
+#          implementation: scripts/create.sh
+#        configure:
+#          inputs:
+#            var_values: { get_property: [ SELF, var_values ] }
+#            CA_CERT: { get_property: [SELF, ca_cert] }
+#            CLIENT_CERT: { get_property: [SELF, client_cert] }
+#            CLIENT_KEY: { get_property: [SELF, client_key] }
+#            SERVER: { get_property: [SELF, server] }
+#            NAMESPACE: { get_property: [SELF, namespace] }
+#            debug_operations: { get_property: [SELF, debug_operations] }
+#          implementation: playbook/configure.yml
+#        start:
+#          inputs:
+#            KUBECONFIG_FILE: { get_attribute: [SELF, kube_config_file_path] }
+#            PARAMETER_FILE: { get_attribute: [SELF, parameter_file] }
+#            CONFIG_FILE: { get_attribute: [SELF, config_file_path] }
+#            debug_operations: { get_property: [SELF, debug_operations] }
+#          implementation: scripts/delete.sh
+#        stop:
+#          inputs:
+#            KUBECONFIG_FILE: { get_attribute: [SELF, kube_config_file_path] }
+#            PARAMETER_FILE: { get_attribute: [SELF, parameter_file] }
+#            CONFIG_FILE: { get_attribute: [SELF, config_file_path] }
+#            debug_operations: { get_property: [SELF, debug_operations] }
+#          implementation: scripts/delete.sh
