@@ -43,6 +43,12 @@ node_types:
         description: helm release name
         type: string
         required: true
+      inputs_loopups:
+        type: map
+        required: false
+        description: Mapping between output names and k8s lookups.
+        entry_schema:
+          type: string
       outputs:
         type: map
         required: false

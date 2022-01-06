@@ -1,0 +1,38 @@
+tosca_definitions_version: alien_dsl_3_0_0
+
+metadata:
+  template_name: org.alien4cloud.k8s.helm.samples.MyServer
+  template_version: 3.0.0-SNAPSHOT
+  template_author: a4c
+
+imports:
+  - org.alien4cloud.k8s.helm:3.0.0
+
+description: >
+  Helm / TOSCA integration
+
+node_types:
+  org.alien4cloud.k8s.helm.samples.nodes.MyServer:
+    derived_from: org.alien4cloud.k8s.helm.HelmChart
+    capabilities:
+      http_endpoint: org.alien4cloud.k8s.helm.samples.capabilities.MyServer
+    artifacts:
+      - chart:
+          file: chart
+          type: tosca.artifacts.File
+      - values:
+          file: values/values.yaml
+          type: tosca.artifacts.File
+
+capability_types:
+  org.alien4cloud.k8s.helm.samples.capabilities.MyServer:
+    derived_from: tosca.capabilities.Endpoint
+    properties:
+      lookups:
+        type: map
+        required: false
+        description: Mapping between properties names and k8s lookups.
+        entry_schema:
+          type: string
+        default:
+          port: kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services xde-my-service
